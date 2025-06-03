@@ -13,17 +13,16 @@ let roomSortDirection = 'asc';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    // Clear localStorage to force load of default data
-    localStorage.removeItem('agmsc_rooms');
-    localStorage.removeItem('agmsc_courses');
-    
+    // Load existing data (don't clear it!)
     loadData();
     migrateCourseData();
     initializeEventListeners();
     renderAll();
     
-    // Save the default data
-    saveData();
+    // Only save if there's no existing data
+    if (!localStorage.getItem('agmsc_rooms') || !localStorage.getItem('agmsc_courses')) {
+        saveData();
+    }
 });
 
 /**
@@ -50,7 +49,10 @@ function saveData() {
         localStorage.setItem('agmsc_agmscYear', agmscYear);
         localStorage.setItem('agmsc_roomSortColumn', roomSortColumn || '');
         localStorage.setItem('agmsc_roomSortDirection', roomSortDirection || 'asc');
+        
+        console.log('Data saved successfully'); // Debug log
     } catch (error) {
+        console.error('Error saving data:', error); // Debug log
         showToast('Error saving data: ' + error.message, 'error');
     }
 }
@@ -117,7 +119,10 @@ function loadData() {
                 }
             }, 100);
         }
+        
+        console.log('Data loaded successfully'); // Debug log
     } catch (error) {
+        console.error('Error loading data:', error); // Debug log
         showToast('Error loading data: ' + error.message, 'error');
         rooms = getDefaultRooms();
         courses = getDefaultCourses();
@@ -219,10 +224,10 @@ function getDefaultCourses() {
 }
 
 function syncRoomAssignments() {
-    // Clear all room assignments first
+    // Clear all room assignments first (but preserve availability state)
     rooms.forEach(room => {
         room.assignedTo = null;
-        room.available = true;
+        // DON'T change room.available here - preserve user's checkbox state
     });
     
     // Set room assignments based on course assignments
@@ -231,8 +236,7 @@ function syncRoomAssignments() {
             const room = rooms.find(r => r.name === course.assignedRoom);
             if (room) {
                 room.assignedTo = course.topic;
-                // Mark room as unavailable if it's assigned
-                room.available = false;
+                // DON'T automatically change availability - let user control this
             }
         }
     });
@@ -343,6 +347,7 @@ function updateRoom(roomId, field, value) {
         if (field === 'seats') {
             value = parseInt(value) || 0;
         } else if (field === 'available') {
+            // Ensure boolean conversion and handle assignments
             value = Boolean(value);
             if (!value && room.assignedTo) {
                 // If marking as unavailable but has assignment, clear assignment
@@ -352,6 +357,9 @@ function updateRoom(roomId, field, value) {
                     }
                 });
                 room.assignedTo = null;
+                showToast(`Room ${room.name} marked unavailable - assignment cleared`, 'warning');
+            } else if (value && !room.assignedTo) {
+                showToast(`Room ${room.name} marked available`, 'success');
             }
         } else if (field === 'rmuStatus') {
             const previousStatus = room.rmuStatus;
@@ -373,16 +381,31 @@ function updateRoom(roomId, field, value) {
                 // Don't automatically make it available - let user decide
                 showToast(`Room ${room.name} RMU status approved - you can now manually mark it available if needed`, 'info');
             }
+        } else if (field === 'normalUsage') {
+            // Ensure radio button selections are saved
+            room.normalUsage = value;
         }
         
+        // Update the field
         room[field] = value;
+        
+        // CRITICAL: Save immediately after any change
         saveData();
+        
+        // Re-render everything to reflect changes
         renderAll();
+        
+        // Debug logging to confirm save
+        console.log(`Updated room ${room.name}, field: ${field}, value: ${value}`);
     }
 }
 
 function checkAllAvailable() {
-    rooms.forEach(room => room.available = true);
+    rooms.forEach(room => {
+        room.available = true;
+    });
+    
+    // Save the changes immediately
     saveData();
     renderRoomsTable();
     renderAssignments();
@@ -403,9 +426,11 @@ function uncheckAllAvailable() {
             room.assignedTo = null;
         }
     });
+    
+    // Save the changes immediately
     saveData();
     renderAll();
-    showToast('All rooms marked as unavailable', 'success');
+    showToast('All rooms marked as unavailable - assignments cleared', 'success');
 }
 
 
@@ -463,6 +488,26 @@ function updateCourse(courseId, field, value) {
         }
         
         course[field] = value;
+        saveData();
+        renderAll();
+    }
+}
+
+// Add this function to handle attendance updates and save immediately
+function updateCourseAttendance(courseId, year, value) {
+    const course = courses.find(c => c.id === courseId);
+    if (course) {
+        if (!course.attendanceByYear) {
+            course.attendanceByYear = {};
+        }
+        
+        const numValue = parseInt(value) || null;
+        course.attendanceByYear[year] = numValue;
+        
+        // Recalculate average
+        course.avgAttendance = calculateAverageAttendance(course);
+        
+        // Save immediately after any change
         saveData();
         renderAll();
     }
@@ -543,7 +588,7 @@ function updateSwapPreview() {
                     <div style="font-size: 1.5em; color: hsl(210, 79%, 46%);">
                         <i class="fas fa-exchange-alt"></i>
                     </div>
-                    <div style="text-align: center; padding: 15px; background-color: hsl(210, 40%, 98%); border-radius: 6px;">
+                    <div style="text-align: center; padding: 15px, 0, 15px, 0; background-color: hsl(210, 40%, 98%); border-radius: 6px;">
                         <strong>${course2.topic}</strong><br>
                         <small>Current: ${course2.assignedRoom}</small><br>
                         <small style="color: hsl(142, 71%, 45%);">→ Will get: ${course1.assignedRoom}</small>
@@ -1532,6 +1577,7 @@ function createReportHTML(year) {
                 <div class="report-summary-item">
                     <div class="report-summary-value">${assignedRooms}</div>
                     <div class="report-summary-label">Rooms Assigned</div>
+                </div>
                 </div>
                 <div class="report-summary-item">
                     <div class="report-summary-value">${totalCourses}</div>
