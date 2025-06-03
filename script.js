@@ -75,6 +75,9 @@ function loadData() {
             courses = JSON.parse(savedCourses);
             // Ensure all courses have the required attendance properties
             migrateCourseData();
+            
+            // IMPORTANT: Fix room name mismatches after loading old data
+            fixRoomNameMismatches();
         } else {
             // Initialize with default AGMSC data if no saved data exists
             courses = getDefaultCourses();
@@ -132,10 +135,10 @@ function loadData() {
 
 function getDefaultRooms() {
     return [
-        {id: generateId(), name: "Hall 1", building: "UPMC", seats: 115, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null, normalUsage: "lecture", autoManage: true},
-        {id: generateId(), name: "Hall 2", building: "UPMC", seats: 60, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null, normalUsage: "lecture", autoManage: true},
-        {id: generateId(), name: "Hall 5", building: "UPMC", seats: 200, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null},
-        {id: generateId(), name: "Hall 6", building: "UPMC", seats: 50, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null},
+        {id: generateId(), name: "UPMC Hall 1", building: "UPMC", seats: 115, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null, normalUsage: "lecture", autoManage: true},
+        {id: generateId(), name: "UPMC Hall 2", building: "UPMC", seats: 60, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null, normalUsage: "lecture", autoManage: true},
+        {id: generateId(), name: "UPMC Hall 5", building: "UPMC", seats: 200, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null},
+        {id: generateId(), name: "UPMC Hall 6", building: "UPMC", seats: 50, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "11", building: "Scaife", seats: 47, seatType: "Tablet desks", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "141", building: "John Jay", seats: 40, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "142", building: "John Jay", seats: 40, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
@@ -145,7 +148,7 @@ function getDefaultRooms() {
         {id: generateId(), name: "PH-304", building: "Patrick Henry", seats: 32, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "PH-306", building: "Patrick Henry", seats: 32, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "Hopwood Hall", building: "Patrick Henry", seats: 138, seatType: "Tablet Desks", available: true, rmuStatus: "Approved", assignedTo: null},
-        {id: generateId(), name: "Auditorium", building: "School of Business", seats: 200, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null},
+        {id: generateId(), name: "School of Business Auditorium", building: "School of Business", seats: 200, seatType: "Chairs", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "102", building: "Hale", seats: 30, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "104", building: "Hale", seats: 40, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
         {id: generateId(), name: "105", building: "Hale", seats: 40, seatType: "Tables", available: true, rmuStatus: "Approved", assignedTo: null},
@@ -178,22 +181,22 @@ function getDefaultRooms() {
 function getDefaultCourses() {
     return [
         // Lectures with complete 2023 and 2024 attendance data
-        {id: generateId(), topic: "Fundamentals of Measurement & Regulation", type: "Lecture", expectedAttendance: 90, assignedRoom: "Hall 1", maxAttendance2023: 62, maxAttendance2024: 90, avgAttendance: 76, previousRoom: "Hall 1"},
-        {id: generateId(), topic: "Basics of Measurement & Pressure Control", type: "Lecture", expectedAttendance: 90, assignedRoom: "Hall 5", maxAttendance2023: 58, maxAttendance2024: 90, avgAttendance: 74, previousRoom: "Hall 5"},
+        {id: generateId(), topic: "Fundamentals of Measurement & Regulation", type: "Lecture", expectedAttendance: 90, assignedRoom: "UPMC Hall 1", maxAttendance2023: 62, maxAttendance2024: 90, avgAttendance: 76, previousRoom: "UPMC Hall 1"},
+        {id: generateId(), topic: "Basics of Measurement & Pressure Control", type: "Lecture", expectedAttendance: 90, assignedRoom: "UPMC Hall 5", maxAttendance2023: 58, maxAttendance2024: 90, avgAttendance: 74, previousRoom: "UPMC Hall 5"},
         {id: generateId(), topic: "Advanced Metering-Low Volume", type: "Lecture", expectedAttendance: 53, assignedRoom: "11", maxAttendance2023: 41, maxAttendance2024: 53, avgAttendance: 47, previousRoom: "11"},
         {id: generateId(), topic: "Advanced Metering-High Volume", type: "Lecture", expectedAttendance: 40, assignedRoom: "142", maxAttendance2023: 32, maxAttendance2024: 40, avgAttendance: 36, previousRoom: "142"},
-        {id: generateId(), topic: "Pressure Control", type: "Lecture", expectedAttendance: 89, assignedRoom: "Hall 2", maxAttendance2023: 89, maxAttendance2024: 89, avgAttendance: 89, previousRoom: "Hall 2"},
+        {id: generateId(), topic: "Pressure Control", type: "Lecture", expectedAttendance: 89, assignedRoom: "UPMC Hall 2", maxAttendance2023: 89, maxAttendance2024: 89, avgAttendance: 89, previousRoom: "UPMC Hall 2"},
         {id: generateId(), topic: "Instrumentation & Automation", type: "Lecture", expectedAttendance: 31, assignedRoom: "263", maxAttendance2023: 33, maxAttendance2024: 31, avgAttendance: 32, previousRoom: "263"},
         {id: generateId(), topic: "General Topics", type: "Lecture", expectedAttendance: 53, assignedRoom: "264", maxAttendance2023: 49, maxAttendance2024: 53, avgAttendance: 51, previousRoom: "264"},
         {id: generateId(), topic: "Production & Storage", type: "Lecture", expectedAttendance: 36, assignedRoom: "PH-304", maxAttendance2023: 40, maxAttendance2024: 36, avgAttendance: 38, previousRoom: "PH-304"},
         {id: generateId(), topic: "Gas Quality", type: "Lecture", expectedAttendance: 35, assignedRoom: "PH-306", maxAttendance2023: 31, maxAttendance2024: 35, avgAttendance: 33, previousRoom: "PH-306"},
         {id: generateId(), topic: "Communications & SCADA", type: "Lecture", expectedAttendance: 42, assignedRoom: "Hopwood Hall", maxAttendance2023: 32, maxAttendance2024: 42, avgAttendance: 37, previousRoom: "Hopwood Hall"},
-        {id: generateId(), topic: "Next-Generation Gas Sources", type: "Lecture", expectedAttendance: 200, assignedRoom: "Auditorium", maxAttendance2023: 200, maxAttendance2024: 200, avgAttendance: 200, previousRoom: "Auditorium"},
-        {id: generateId(), topic: "Odorization", type: "Lecture", expectedAttendance: 37, assignedRoom: "Hall 6", maxAttendance2023: 37, maxAttendance2024: 37, avgAttendance: 37, previousRoom: "Hall 6"},
+        {id: generateId(), topic: "Next-Generation Gas Sources", type: "Lecture", expectedAttendance: 200, assignedRoom: "School of Business Auditorium", maxAttendance2023: 200, maxAttendance2024: 200, avgAttendance: 200, previousRoom: "School of Business Auditorium"},
+        {id: generateId(), topic: "Odorization", type: "Lecture", expectedAttendance: 37, assignedRoom: "UPMC Hall 6", maxAttendance2023: 37, maxAttendance2024: 37, avgAttendance: 37, previousRoom: "UPMC Hall 6"},
         {id: generateId(), topic: "Current Industry Topics", type: "Lecture", expectedAttendance: 42, assignedRoom: "143", maxAttendance2023: 38, maxAttendance2024: 42, avgAttendance: 40, previousRoom: "143"},
         {id: generateId(), topic: "NGL/Wet Gas", type: "Lecture", expectedAttendance: 23, assignedRoom: "141", maxAttendance2023: 23, maxAttendance2024: 23, avgAttendance: 23, previousRoom: "141"},
 
-        // Hands-On
+        // Hands-On courses remain the same
         {id: generateId(), topic: "Lab 1", type: "Hands-On", expectedAttendance: 27, assignedRoom: "202", maxAttendance2023: 30, maxAttendance2024: 27, avgAttendance: 30, previousRoom: "202"},
         {id: generateId(), topic: "Lab 2", type: "Hands-On", expectedAttendance: 21, assignedRoom: "306", maxAttendance2023: 45, maxAttendance2024: 21, avgAttendance: 45, previousRoom: "306"},
         {id: generateId(), topic: "Lab 3", type: "Hands-On", expectedAttendance: 32, assignedRoom: "304", maxAttendance2023: 20, maxAttendance2024: 32, avgAttendance: 20, previousRoom: "304"},
@@ -224,19 +227,24 @@ function getDefaultCourses() {
 }
 
 function syncRoomAssignments() {
-    // Clear all room assignments first (but preserve availability state)
+    // DON'T change availability - preserve user's checkbox states
     rooms.forEach(room => {
         room.assignedTo = null;
-        // DON'T change room.available here - preserve user's checkbox state
+        // REMOVE these lines that override checkbox states:
+        // room.available = true;
     });
     
     // Set room assignments based on course assignments
     courses.forEach(course => {
         if (course.assignedRoom) {
             const room = rooms.find(r => r.name === course.assignedRoom);
-            if (room) {
+            if (room && room.available && room.rmuStatus !== 'Denied') {
                 room.assignedTo = course.topic;
-                // DON'T automatically change availability - let user control this
+                // REMOVE this line that overrides checkbox states:
+                // room.available = false;
+            } else if (room && (!room.available || room.rmuStatus === 'Denied')) {
+                // Clear invalid assignments
+                course.assignedRoom = null;
             }
         }
     });
@@ -493,26 +501,6 @@ function updateCourse(courseId, field, value) {
     }
 }
 
-// Add this function to handle attendance updates and save immediately
-function updateCourseAttendance(courseId, year, value) {
-    const course = courses.find(c => c.id === courseId);
-    if (course) {
-        if (!course.attendanceByYear) {
-            course.attendanceByYear = {};
-        }
-        
-        const numValue = parseInt(value) || null;
-        course.attendanceByYear[year] = numValue;
-        
-        // Recalculate average
-        course.avgAttendance = calculateAverageAttendance(course);
-        
-        // Save immediately after any change
-        saveData();
-        renderAll();
-    }
-}
-
 /**
  * Room assignment functions
  */
@@ -588,7 +576,7 @@ function updateSwapPreview() {
                     <div style="font-size: 1.5em; color: hsl(210, 79%, 46%);">
                         <i class="fas fa-exchange-alt"></i>
                     </div>
-                    <div style="text-align: center; padding: 15px, 0, 15px, 0; background-color: hsl(210, 40%, 98%); border-radius: 6px;">
+                    <div style="text-align: center; padding: 15px; background-color: hsl(210, 40%, 98%); border-radius: 6px;">
                         <strong>${course2.topic}</strong><br>
                         <small>Current: ${course2.assignedRoom}</small><br>
                         <small style="color: hsl(142, 71%, 45%);">→ Will get: ${course1.assignedRoom}</small>
@@ -945,7 +933,7 @@ function renderDataTable() {
     if (courses.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center" style="padding: 40px; color: hsl(var(--text-secondary)); font-style: italic;">
+                <td colspan="11" class="text-center" style="padding: 40px; color: hsl(var(--text-secondary)); font-style: italic;">
                     <i class="fas fa-graduation-cap" style="font-size: 2em; margin-bottom: 10px; display: block;"></i>
                     No courses added yet. Click "Add New Course" to get started.
                 </td>
@@ -957,6 +945,9 @@ function renderDataTable() {
     courses.forEach(course => {
         const assignedRoom = rooms.find(r => r.name === course.assignedRoom);
         const capacityInfo = getCapacityInfo(course, assignedRoom);
+        
+        // Fixed: Show only the room name (same as Room Name column in Classroom Management)
+        const roomDisplay = course.assignedRoom || '<em>Not assigned</em>';
         
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -971,7 +962,7 @@ function renderDataTable() {
             <td contenteditable="true" onblur="updateCourseAttendance('${course.id}', '${selectedYear2}', this.textContent)">${getAttendanceForYear(course, selectedYear2)}</td>
             <td style="background-color: hsl(210, 40%, 98%); font-style: italic;">${calculateAverageAttendance(course)}</td>
             <td contenteditable="true" onblur="updateCourse('${course.id}', 'previousRoom', this.textContent)">${course.previousRoom || ''}</td>
-            <td>${course.assignedRoom || '<em>Not assigned</em>'}</td>
+            <td>${roomDisplay}</td>
             <td>${assignedRoom ? assignedRoom.seats : '<em>N/A</em>'}</td>
             <td class="${capacityInfo.class}">${capacityInfo.percentage}</td>
             <td>
@@ -988,6 +979,25 @@ function renderDataTable() {
         
         tbody.appendChild(row);
     });
+}
+
+function updateCourseAttendance(courseId, year, value) {
+    const course = courses.find(c => c.id === courseId);
+    if (course) {
+        if (!course.attendanceByYear) {
+            course.attendanceByYear = {};
+        }
+        
+        const numValue = parseInt(value) || null;
+        course.attendanceByYear[year] = numValue;
+        
+        // Recalculate average
+        course.avgAttendance = calculateAverageAttendance(course);
+        
+        // Save immediately after any change
+        saveData();
+        renderAll();
+    }
 }
 
 function updateSwapDropdowns() {
@@ -1188,6 +1198,48 @@ function migrateCourseData() {
         // Remove autoManage property if it exists
         delete room.autoManage;
     });
+}
+
+// Add this function to fix the mismatched room assignments:
+function fixRoomNameMismatches() {
+    console.log('Fixing room name mismatches...');
+    
+    // Mapping of old room names to new room names
+    const roomNameMappings = {
+        "Hall 1": "UPMC Hall 1",
+        "Hall 2": "UPMC Hall 2", 
+        "Hall 5": "UPMC Hall 5",
+        "Hall 6": "UPMC Hall 6",
+        "Auditorium": "School of Business Auditorium"
+    };
+    
+    let fixedCount = 0;
+    
+    // Update course assignments to use new room names
+    courses.forEach(course => {
+        if (course.assignedRoom && roomNameMappings[course.assignedRoom]) {
+            console.log(`Updating ${course.topic}: ${course.assignedRoom} → ${roomNameMappings[course.assignedRoom]}`);
+            course.assignedRoom = roomNameMappings[course.assignedRoom];
+            fixedCount++;
+        }
+        
+        // Also fix previousRoom if it exists
+        if (course.previousRoom && roomNameMappings[course.previousRoom]) {
+            course.previousRoom = roomNameMappings[course.previousRoom];
+        }
+    });
+    
+    // Re-sync room assignments
+    syncRoomAssignments();
+    
+    // Save the fixes
+    saveData();
+    
+    // Re-render everything
+    renderAll();
+    
+    console.log(`Fixed ${fixedCount} room name mismatches`);
+    showToast(`Fixed ${fixedCount} room name mismatches`, 'success');
 }
 
 /**
@@ -1578,7 +1630,7 @@ function createReportHTML(year) {
                     <div class="report-summary-value">${assignedRooms}</div>
                     <div class="report-summary-label">Rooms Assigned</div>
                 </div>
-                </div>
+                                              </div>
                 <div class="report-summary-item">
                     <div class="report-summary-value">${totalCourses}</div>
                     <div class="report-summary-label">Total Courses</div>
