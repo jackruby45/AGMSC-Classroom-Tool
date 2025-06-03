@@ -37,9 +37,19 @@ let selectedYear2 = '2024';
  */
 function saveData() {
     try {
+        // Get current AGMSC year if element exists
+        const agmscYearElement = document.getElementById('agmscYear');
+        const agmscYear = agmscYearElement ? agmscYearElement.value : new Date().getFullYear();
+        
+        // Save all data including current UI states
         localStorage.setItem('agmsc_rooms', JSON.stringify(rooms));
         localStorage.setItem('agmsc_courses', JSON.stringify(courses));
         localStorage.setItem('agmsc_attendanceBase', attendanceBase);
+        localStorage.setItem('agmsc_selectedYear1', selectedYear1);
+        localStorage.setItem('agmsc_selectedYear2', selectedYear2);
+        localStorage.setItem('agmsc_agmscYear', agmscYear);
+        localStorage.setItem('agmsc_roomSortColumn', roomSortColumn || '');
+        localStorage.setItem('agmsc_roomSortDirection', roomSortDirection || 'asc');
     } catch (error) {
         showToast('Error saving data: ' + error.message, 'error');
     }
@@ -83,6 +93,30 @@ function loadData() {
         
         // Sync room assignments
         syncRoomAssignments();
+        
+        // Load additional saved states
+        const savedYear1 = localStorage.getItem('agmsc_selectedYear1');
+        if (savedYear1) selectedYear1 = savedYear1;
+        
+        const savedYear2 = localStorage.getItem('agmsc_selectedYear2');
+        if (savedYear2) selectedYear2 = savedYear2;
+        
+        const savedAGMSCYear = localStorage.getItem('agmsc_agmscYear');
+        const savedRoomSort = localStorage.getItem('agmsc_roomSortColumn');
+        const savedSortDirection = localStorage.getItem('agmsc_roomSortDirection');
+        
+        if (savedRoomSort) roomSortColumn = savedRoomSort;
+        if (savedSortDirection) roomSortDirection = savedSortDirection;
+        
+        // Restore AGMSC year dropdown after DOM loads
+        if (savedAGMSCYear) {
+            setTimeout(() => {
+                const agmscYearElement = document.getElementById('agmscYear');
+                if (agmscYearElement) {
+                    agmscYearElement.value = savedAGMSCYear;
+                }
+            }, 100);
+        }
     } catch (error) {
         showToast('Error loading data: ' + error.message, 'error');
         rooms = getDefaultRooms();
@@ -221,6 +255,14 @@ function initializeEventListeners() {
             closeConflictModal();
         }
     });
+    
+    // AGMSC Year dropdown listener
+    const agmscYearSelect = document.getElementById('agmscYear');
+    if (agmscYearSelect) {
+        agmscYearSelect.addEventListener('change', function() {
+            saveData(); // Save immediately when changed
+        });
+    }
 }
 
 function populateYearDropdowns() {
@@ -1319,15 +1361,28 @@ function saveToFile() {
     const fileName = prompt('Enter a name for your save file:', 'classroom_assignments_' + new Date().toISOString().split('T')[0]);
     if (!fileName) return;
     
+    // Get current AGMSC year
+    const agmscYearElement = document.getElementById('agmscYear');
+    const agmscYear = agmscYearElement ? agmscYearElement.value : new Date().getFullYear();
+    
     const dataToSave = {
         version: '1.0',
         timestamp: new Date().toISOString(),
         rooms: rooms,
         courses: courses,
+        settings: {
+            attendanceBase: attendanceBase,
+            selectedYear1: selectedYear1,
+            selectedYear2: selectedYear2,
+            agmscYear: agmscYear,
+            roomSortColumn: roomSortColumn,
+            roomSortDirection: roomSortDirection
+        },
         metadata: {
             totalRooms: rooms.length,
             totalCourses: courses.length,
-            assignedRooms: rooms.filter(r => r.assignedTo).length
+            assignedRooms: rooms.filter(r => r.assignedTo).length,
+            agmscYear: agmscYear
         }
     };
     
@@ -1388,6 +1443,25 @@ function loadFromFile() {
                 syncRoomAssignments();
                 saveData();
                 renderAll();
+                
+                // Load settings if they exist
+                if (data.settings) {
+                    attendanceBase = data.settings.attendanceBase || '2024';
+                    selectedYear1 = data.settings.selectedYear1 || '2023';
+                    selectedYear2 = data.settings.selectedYear2 || '2024';
+                    roomSortColumn = data.settings.roomSortColumn || null;
+                    roomSortDirection = data.settings.roomSortDirection || 'asc';
+                    
+                    // Restore AGMSC year
+                    if (data.settings.agmscYear) {
+                        setTimeout(() => {
+                            const agmscYearElement = document.getElementById('agmscYear');
+                            if (agmscYearElement) {
+                                agmscYearElement.value = data.settings.agmscYear;
+                            }
+                        }, 100);
+                    }
+                }
                 
                 showToast(`File loaded successfully: ${data.rooms.length} rooms, ${data.courses.length} courses`, 'success');
                 
@@ -1588,7 +1662,6 @@ function generateHistoricalDataTable() {
                     <th>Change in Attendance</th>
                 </tr>
             </thead>
-            <tbody>
     `;
     
     courses.forEach(course => {
