@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGMSC Classroom Selection Tool</title>
+    <link rel="stylesheet" href="styles.css?v=1704272160">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-school"></i> AGMSC Classroom Selection Tool</h1>
+            <p class="subtitle">Written by Tim Bickford</p>
+            <div style="margin-top: 20px;">
+                <label for="agmscYear" style="font-weight: 600; margin-right: 10px; color: hsl(210, 22%, 49%);">AGMSC Year:</label>
+                <select id="agmscYear" style="width: 120px; padding: 8px; border: 1px solid hsl(var(--border)); border-radius: 6px; text-align: center; font-size: 16px;">
+                    <option value="20??" selected>20??</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                    <option value="2031">2031</option>
+                    <option value="2032">2032</option>
+                    <option value="2033">2033</option>
+                    <option value="2034">2034</option>
+                    <option value="2035">2035</option>
+                    <option value="2036">2036</option>
+                    <option value="2037">2037</option>
+                    <option value="2038">2038</option>
+                    <option value="2039">2039</option>
+                    <option value="2040">2040</option>
+                    <option value="2041">2041</option>
+                    <option value="2042">2042</option>
+                    <option value="2043">2043</option>
+                    <option value="2044">2044</option>
+                    <option value="2045">2045</option>
+                    <option value="2046">2046</option>
+                    <option value="2047">2047</option>
+                    <option value="2048">2048</option>
+                    <option value="2049">2049</option>
+                    <option value="2050">2050</option>
+                </select>
+            </div>
+            
+            <!-- Base Calculations Section -->
+            <div style="margin-top: 15px; padding: 10px; border: 1px solid hsl(var(--border)); border-radius: 6px; background-color: hsl(0, 0%, 98%);">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: hsl(210, 22%, 49%);">Base Calculations On:</label>
+                <select id="attendanceBaseSelect" onchange="updateAttendanceBase(this.value)" style="width: 200px; padding: 6px; border: 1px solid hsl(var(--border)); border-radius: 4px; font-size: 14px;">
+                    <option value="2023">2023 Max Attendance</option>
+                    <option value="2024" selected>2024 Max Attendance</option>
+                    <option value="average">Max Ave Attendance</option>
+                    <option value="highest">Highest All Time Attendance</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Instructions Section -->
+        <div class="section" style="background-color: #e8f5e8; border-left: 4px solid #28a745;">
+            <h2 onclick="toggleSection('instructions-content')" style="cursor: pointer; color: #155724;">
+                <i class="fas fa-info-circle"></i> Getting Started - Instructions 
+                <i class="fas fa-chevron-down" id="instructions-chevron"></i>
+            </h2>
+            <div id="instructions-content" style="display: none;">
+                <div style="padding: 15px; background-color: #f8f9fa; border-radius: 6px; margin-bottom: 15px;">
+                    <h3 style="color: #155724; margin-bottom: 15px;"><i class="fas fa-play-circle"></i> How to Use This Tool</h3>
+                    
+                    <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                        <h4 style="color: #0c5460; margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> IMPORTANT: Start Here!</h4>
+                        <p style="color: #0c5460; margin: 0; font-weight: 600;">
+                            Before making any room assignments, you MUST first populate the Data Table with your course and room information. 
+                            The assignment tools depend on this data being entered first.
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="color: #495057; margin-bottom: 10px;"><i class="fas fa-list-ol"></i> Step-by-Step Workflow:</h4>
+                            <ol style="color: #6c757d; line-height: 1.6; margin-left: 20px;">
+                                <li><strong>Data Table Section:</strong> Start by entering all your courses and room data</li>
+                                <li><strong>Classroom Management:</strong> Configure available rooms and RMU statuses</li>
+                                <li><strong>Course Assignments:</strong> Assign rooms to courses using the dropdown interface</li>
+                                <li><strong>Room Swap Tool:</strong> Use to exchange room assignments between courses</li>
+                                <li><strong>Generate Report:</strong> Create final PDF reports for stakeholders</li>
+                            </ol>
+                        </div>
+                        <div>
+                            <h4 style="color: #495057; margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> Pro Tips:</h4>
+                            <ul style="color: #6c757d; line-height: 1.6; margin-left: 20px;">
+                                <li>Save your work frequently using "Save to File"</li>
+                                <li>Use the "Base Calculations" dropdown to switch between attendance years</li>
+                                <li>Check the Assignment Summary for capacity issues</li>
+                                <li>Use the Room Swap Tool to quickly exchange assignments</li>
+                                <li>Export to CSV for external analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                        <h4 style="color: #856404; margin-bottom: 10px;"><i class="fas fa-table"></i> Data Table Setup (Required First Step):</h4>
+                        <div style="color: #856404;">
+                            <p style="margin-bottom: 8px;"><strong>Adding Courses:</strong> Click "Add New Course" to create course entries with attendance data</p>
+                            <p style="margin-bottom: 8px;"><strong>Adding Rooms:</strong> Use "Classroom Management" section to add rooms with capacity and details</p>
+                            <p style="margin-bottom: 8px;"><strong>Editing Data:</strong> Click any cell in the Data Table to edit values directly</p>
+                            <p style="margin: 0;"><strong>Importing Data:</strong> Use "Load from File" if you have a previously saved configuration</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; padding: 15px;">
+                        <h4 style="color: #721c24; margin-bottom: 10px;"><i class="fas fa-exclamation-circle"></i> Common Issues to Avoid:</h4>
+                        <ul style="color: #721c24; line-height: 1.6; margin-left: 20px; margin-bottom: 0;">
+                            <li>Don't try to assign rooms before adding course and room data</li>
+                            <li>Make sure room capacities are entered correctly for accurate calculations</li>
+                            <li>Check RMU statuses in Classroom Management before finalizing assignments</li>
+                            <li>Use "Refresh Table" if data appears out of sync between sections</li>
+                            <li>Save your work before generating reports or making major changes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px;">
+                    <h4 style="color: #155724; margin-bottom: 10px;"><i class="fas fa-keyboard"></i> Quick Reference:</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; color: #155724; font-size: 0.9em;">
+                        <div>
+                            <strong>Data Entry:</strong><br>
+                            • Click cells to edit<br>
+                            • Tab to move between cells<br>
+                            • Enter to save changes
+                        </div>
+                        <div>
+                            <strong>Room Management:</strong><br>
+                            • Check boxes for availability<br>
+                            • Set RMU status for each room<br>
+                            • View current assignments
+                        </div>
+                        <div>
+                            <strong>File Management:</strong><br>
+                            • Save early and often<br>
+                            • Use descriptive file names<br>
+                            • Export reports as PDF
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box available"></div>
+                <span>Available Room</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box unavailable"></div>
+                <span>Unavailable Room</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box assigned"></div>
+                <span>Assigned Room</span>
+            </div>
+            <div class="legend-item">
+                <span class="capacity-ok"><i class="fas fa-circle"></i> Under Capacity</span>
+            </div>
+            <div class="legend-item">
+                <span class="capacity-warning"><i class="fas fa-circle"></i> Near Capacity (90-100%)</span>
+            </div>
+            <div class="legend-item">
+                <span class="capacity-over"><i class="fas fa-circle"></i> Over Capacity</span>
+            </div>
+            <div class="legend-item">
+                <span style="color: hsl(0, 70%, 40%);"><i class="fas fa-times-circle"></i> RMU Denied</span>
+            </div>
+            <div class="legend-item">
+                <span style="color: hsl(45, 70%, 40%);"><i class="fas fa-clock"></i> RMU Pending</span>
+            </div>
+            <div class="legend-item">
+                <span style="color: hsl(200, 70%, 40%);"><i class="fas fa-exclamation-circle"></i> RMU Conditional</span>
+            </div>
+        </div>
+        
+        <!-- Classroom Management Section -->
+        <div class="section">
+            <h2 onclick="toggleSection('classroom-content')" style="cursor: pointer;"><i class="fas fa-door-open"></i> Classroom Management <i class="fas fa-chevron-up" id="classroom-chevron"></i></h2>
+            <div id="classroom-content">
+            <div class="button-group">
+                <button class="btn btn-success" onclick="addNewRoom()">
+                    <i class="fas fa-plus"></i> Add New Room
+                </button>
+                <button class="btn" onclick="checkAllAvailable()">
+                    <i class="fas fa-check-square"></i> Mark All Available
+                </button>
+                <button class="btn" onclick="uncheckAllAvailable()">
+                    <i class="fas fa-square"></i> Mark All Unavailable
+                </button>
+            </div>
+            
+
+            
+            <div class="table-container">
+                <table id="roomsTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortRooms('available')" style="cursor: pointer;">Available <i class="fas fa-sort" id="sort-available"></i></th>
+                            <th onclick="sortRooms('rmuStatus')" style="cursor: pointer;">RMU Status <i class="fas fa-sort" id="sort-rmuStatus"></i></th>
+                            <th onclick="sortRooms('name')" style="cursor: pointer;">Room Name <i class="fas fa-sort" id="sort-name"></i></th>
+                            <th onclick="sortRooms('building')" style="cursor: pointer;">Building <i class="fas fa-sort" id="sort-building"></i></th>
+                            <th onclick="sortRooms('seats')" style="cursor: pointer;"># of Seats <i class="fas fa-sort" id="sort-seats"></i></th>
+                            <th onclick="sortRooms('seatType')" style="cursor: pointer;">Type of Seats <i class="fas fa-sort" id="sort-seatType"></i></th>
+                            <th>Normal Usage</th>
+                            <th onclick="sortRooms('assigned')" style="cursor: pointer;">Currently Assigned To <i class="fas fa-sort" id="sort-assigned"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomsTableBody">
+                        <!-- Rooms will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        
+        <!-- Assignment Section -->
+        <div class="section">
+            <h2 onclick="toggleSection('assignment-content')" style="cursor: pointer;"><i class="fas fa-clipboard-list"></i> Course Assignments <i class="fas fa-chevron-up" id="assignment-chevron"></i></h2>
+            <div id="assignment-content">
+            
+
+            
+            <div class="assignment-section">
+                <div class="assignment-card">
+                    <h3><i class="fas fa-chalkboard-teacher"></i> Lecture Series</h3>
+                    <div id="lectureAssignments"></div>
+                </div>
+                <div class="assignment-card">
+                    <h3><i class="fas fa-hands"></i> Hands-On Series</h3>
+                    <div id="handsOnAssignments"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Room Swap Section -->
+        <div class="section">
+            <h2><i class="fas fa-exchange-alt"></i> Room Swap Tool</h2>
+            <p class="section-description">
+                Select two courses to swap their room assignments. Both courses must have rooms assigned.
+            </p>
+            <div class="swap-container">
+                <div class="swap-input">
+                    <label for="swapCourse1">Course 1:</label>
+                    <select id="swapCourse1">
+                        <option value="">-- Select First Course --</option>
+                    </select>
+                </div>
+                
+                <div class="swap-button-container">
+                    <button class="btn btn-primary" onclick="performRoomSwap()" id="swapButton" disabled>
+                        <i class="fas fa-exchange-alt"></i> Swap Rooms
+                    </button>
+                </div>
+                
+                <div class="swap-input">
+                    <label for="swapCourse2">Course 2:</label>
+                    <select id="swapCourse2">
+                        <option value="">-- Select Second Course --</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="swapPreview" class="swap-preview" style="display: none;">
+                <h4><i class="fas fa-eye"></i> Swap Preview:</h4>
+                <div id="swapDetails"></div>
+            </div>
+            </div>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="section">
+            <h2 onclick="toggleSection('summary-content')" style="cursor: pointer;"><i class="fas fa-chart-bar"></i> Assignment Summary <i class="fas fa-chevron-up" id="summary-chevron"></i></h2>
+            <div id="summary-content">
+            <div class="summary-grid" id="summary">
+                <div class="summary-item">
+                    <div class="summary-value" id="totalAvailable">0</div>
+                    <div class="summary-label">Total Rooms Available</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="roomsAssigned">0</div>
+                    <div class="summary-label">Rooms Assigned</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="roomsUnassigned">0</div>
+                    <div class="summary-label">Rooms Unassigned</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="coursesWithoutRooms">0</div>
+                    <div class="summary-label">Courses Without Rooms</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="capacityIssues">0</div>
+                    <div class="summary-label">Capacity Issues</div>
+                </div>
+            </div>
+            </div>
+        </div>
+        
+        <!-- Editable Data Table Section -->
+        <div class="section">
+            <h2 onclick="toggleSection('datatable-content')" style="cursor: pointer;"><i class="fas fa-table"></i> Data Table <span style="color: #dc3545; font-weight: 600;">(START HERE!)</span> <i class="fas fa-chevron-up" id="datatable-chevron"></i></h2>
+            <div id="datatable-content">
+            <div class="button-group">
+                <button class="btn" onclick="refreshDataTable()">
+                    <i class="fas fa-sync-alt"></i> Refresh Table
+                </button>
+                <button class="btn btn-success" onclick="exportTableToCSV()">
+                    <i class="fas fa-download"></i> Export to CSV
+                </button>
+                <button class="btn" onclick="copyTableToClipboard()">
+                    <i class="fas fa-copy"></i> Copy Table
+                </button>
+                <button class="btn btn-success" onclick="addNewCourse()">
+                    <i class="fas fa-plus"></i> Add New Course
+                </button>
+            </div>
+            
+            <div class="button-group" style="margin-top: 15px; border-top: 1px solid hsl(var(--border)); padding-top: 15px;">
+                <button class="btn btn-primary" onclick="saveToFile()">
+                    <i class="fas fa-save"></i> Save to File
+                </button>
+                <button class="btn btn-primary" onclick="loadFromFile()">
+                    <i class="fas fa-folder-open"></i> Load from File
+                </button>
+                <button class="btn btn-success" onclick="generateReport()">
+                    <i class="fas fa-file-alt"></i> Generate Report
+                </button>
+            </div>
+            <p class="section-description">
+                <i class="fas fa-info-circle"></i> Click on any cell to edit. Changes will automatically update all sections and recalculate percentages.<br>
+                Capacity percentages are automatically calculated based on attendance and seat numbers.
+            </p>
+            
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Topic</th>
+                            <th>Type</th>
+                            <th>
+                                <select id="year1Dropdown" onchange="updateAttendanceColumn(1, this.value)" style="background: transparent; border: none; color: white; font-weight: 600;">
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                    <option value="2031">2031</option>
+                                    <option value="2032">2032</option>
+                                    <option value="2033">2033</option>
+                                    <option value="2034">2034</option>
+                                    <option value="2035">2035</option>
+                                    <option value="2036">2036</option>
+                                    <option value="2037">2037</option>
+                                    <option value="2038">2038</option>
+                                    <option value="2039">2039</option>
+                                    <option value="2040">2040</option>
+                                    <option value="2041">2041</option>
+                                    <option value="2042">2042</option>
+                                    <option value="2043">2043</option>
+                                    <option value="2044">2044</option>
+                                    <option value="2045">2045</option>
+                                    <option value="2046">2046</option>
+                                    <option value="2047">2047</option>
+                                    <option value="2048">2048</option>
+                                    <option value="2049">2049</option>
+                                    <option value="2050">2050</option>
+                                </select> Max Attendance
+                            </th>
+                            <th>
+                                <select id="year2Dropdown" onchange="updateAttendanceColumn(2, this.value)" style="background: transparent; border: none; color: white; font-weight: 600;">
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                    <option value="2031">2031</option>
+                                    <option value="2032">2032</option>
+                                    <option value="2033">2033</option>
+                                    <option value="2034">2034</option>
+                                    <option value="2035">2035</option>
+                                    <option value="2036">2036</option>
+                                    <option value="2037">2037</option>
+                                    <option value="2038">2038</option>
+                                    <option value="2039">2039</option>
+                                    <option value="2040">2040</option>
+                                    <option value="2041">2041</option>
+                                    <option value="2042">2042</option>
+                                    <option value="2043">2043</option>
+                                    <option value="2044">2044</option>
+                                    <option value="2045">2045</option>
+                                    <option value="2046">2046</option>
+                                    <option value="2047">2047</option>
+                                    <option value="2048">2048</option>
+                                    <option value="2049">2049</option>
+                                    <option value="2050">2050</option>
+                                </select> Max Attendance
+                            </th>
+                            <th>Average Attendance</th>
+                            <th>Previous Room</th>
+                            <th>Assigned Room</th>
+                            <th>Room Capacity</th>
+                            <th>Capacity %</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Room Conflict Dialog -->
+    <div id="conflictModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-triangle"></i> Room Conflict Detected
+            </div>
+            <div class="modal-body">
+                <div id="conflictDetails"></div>
+                <div class="conflict-info">
+                    <strong>What would you like to do?</strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeConflictModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="forceAssignment()">Force Assignment</button>
+                <button class="btn btn-primary" onclick="resolveConflict()">Resolve Conflict</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content" style="max-width: 90%; width: 1000px;">
+            <div class="modal-header">
+                <i class="fas fa-file-alt"></i> AGMSC Classroom Assignment Report
+                <button class="btn" onclick="closeReportModal()" style="float: right; padding: 5px 10px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="button-group" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="printReport()">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                    <button class="btn btn-success" onclick="exportReportToPDF()">
+                        <i class="fas fa-file-pdf"></i> Export to PDF
+                    </button>
+                </div>
+                <div id="reportContent" class="report-content">
+                    <!-- Report content will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <script src="script.js?v=1704272160"></script>
+</body>
+</html>
